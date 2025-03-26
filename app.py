@@ -7,8 +7,8 @@ app = Flask(__name__)
 # Load the summarization model
 summarizer = pipeline("summarization", model="facebook/bart-large-cnn")
 
-@app.route('/extract_text', methods=['POST'])
-def extract_text():
+@app.route('/summarize', methods=['POST'])
+def summarize_pdf():
     if 'pdf' not in request.files:
         return jsonify({"error": "No PDF file uploaded"}), 400
     
@@ -24,19 +24,14 @@ def extract_text():
     if not extracted_text.strip():
         return jsonify({"error": "No text found in PDF"}), 400
 
-    # Summarize extracted text (if too long, break into chunks)
-    max_length = 5000  # Adjust based on need
-    min_length = 100
+    # Summarize extracted text
     try:
-        summary = summarizer(extracted_text, max_length=max_length, min_length=min_length, do_sample=False)
+        summary = summarizer(extracted_text, max_length=500, min_length=100, do_sample=False)
         summarized_text = summary[0]['summary_text']
     except Exception as e:
         summarized_text = "Error in summarization: " + str(e)
 
-    return jsonify({
-        "extracted_text": extracted_text.strip(),
-        "summary": summarized_text
-    })
+    return jsonify({"summary": summarized_text})
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
