@@ -25,7 +25,7 @@ def extract_text():
         return jsonify({"error": "No text found in PDF"}), 400
 
     # Summarize extracted text (if too long, break into chunks)
-    max_length = 500  # Adjust based on need
+    max_length = 5000  # Adjust based on need
     min_length = 100
     try:
         summary = summarizer(extracted_text, max_length=max_length, min_length=min_length, do_sample=False)
